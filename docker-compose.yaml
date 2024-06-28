@@ -1,0 +1,23 @@
+services:
+  web:
+    build:
+      context: .
+      dockerfile: vite.Dockerfile
+    ports:
+      - '5000:80'
+    volumes:
+      - ./htdocs:/usr/local/apache2/htdocs
+
+  ssh-server:
+    image: linuxserver/openssh-server:version-9.6_p1-r0
+    ports:
+      - 5022:2222
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Europe/London
+      - PASSWORD_ACCESS=false
+      - USER_NAME=test
+    volumes:
+      - ./ssh:/config
+      - ./htdocs:/htdocs
