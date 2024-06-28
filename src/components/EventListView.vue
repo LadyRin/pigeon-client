@@ -1,4 +1,37 @@
 <script setup lang="ts">
+import { onMounted, ref } from 'vue'
+
+import type { Event, PaginationResponse } from '@/types'
+import { eventService } from '@/EventService'
+
+import EventComponent from '@/components/EventComponent.vue'
+import PaginationMenu from '@/components/PaginationMenu.vue'
+
+const search = ref('')
+const events = ref<Event[]>([])
+
+const pagination = ref({
+  itemsLength: 0,
+  itemsPerPage: 10,
+  pageCount: 0,
+  page: 1,
+  pageStart: 0,
+  pageStop: 0
+})
+
+const fetchEvents = () => {
+  eventService.getAllPaginated(pagination.value.itemsPerPage, pagination.value.page, search.value).then((res) => {
+    events.value = res.results
+    pagination.value.itemsLength = res.count
+    pagination.value.pageCount = res.num_pages
+    pagination.value.pageStart = res.start_index - 1
+    pagination.value.pageStop = res.end_index
+  })
+}
+
+onMounted(() => {
+  fetchEvents()
+})
 </script>
 
 <template>
@@ -17,18 +50,11 @@
         :optionValues="[5, 10, 20, 50]" />
     </div>
     <div class="event-list" v-if="events.length > 0">
-      <EventComponent v-for="event in events" :key="event.id" :event="event" @delete="deleteEvent(event)" />
+      <EventComponent v-for="event in events" :key="event.id" :event="event" />
     </div>
     <div v-else>
       <p>Aucun événement trouvé</p>
     </div>
-    <PaginationMenu
-      v-if="pagination.pageCount > 1"
-      v-model:page="pagination.page"
-      v-model:items-per-page="pagination.itemsPerPage"
-      :pagination="pagination"
-      @fetch="fetchEvents"
-      :optionValues="[5, 10, 20, 50]" />
   </div>
 </template>
 
