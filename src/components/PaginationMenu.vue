@@ -40,11 +40,6 @@ const nextPage = () => {
 
 <template>
   <div class="pagination">
-    <span>Items per page:</span>
-    <select v-model="itemsPerPage" @change="emit('fetch')">
-      <option v-for="value in props.optionValues" :value="value" :key="value">{{ value }}</option>
-    </select>
-
     <span>{{ pagination.pageStart + 1 }} - {{ pagination.pageStop }} of {{ pagination.itemsLength }}</span>
     <button id="previous-page" @click="previousPage" :disabled="!canPrevious">
       <span class="material-symbols-outlined">arrow_back</span>

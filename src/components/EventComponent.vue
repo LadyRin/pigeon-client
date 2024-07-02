@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import type { Event } from '@/types'
 import { computed, ref } from 'vue'
+import EventModalComponent from '@/components/EventModalComponent.vue'
+
 import { formatTime, formatDate } from '@/FormatUtils'
 
 const props = defineProps<{
@@ -33,6 +35,7 @@ const timeStatus = computed(() => {
         <span v-else-if="timeStatus == 'future'">(À venir)</span>
         <span v-else-if="timeStatus == 'past'">(Passé)</span>
       </div>
+      <button class="material-symbols-outlined details-button" @click="showDetails = true">info</button>
     </div>
 
     <h1>{{ event.event_type }}: {{ event.title }}</h1>
@@ -41,64 +44,35 @@ const timeStatus = computed(() => {
       <span v-if="event.speaker_from != ''"> ({{ event.speaker_from }}) </span>
     </h2>
     <p class="theme">({{ event.theme }})</p>
-
-    <div class="description-expand" :class="{ show: showDetails }">
-      <div class="description">
-        <h3>Sommaire:</h3>
-        <p>{{ event.description }}</p>
-      </div>
-    </div>
-
-    <button @click="showDetails = !showDetails" v-if="event.description">
-      <span v-if="showDetails">Cacher</span>
-      <span v-else>Détails</span>
-    </button>
+    <Transition>
+      <EventModalComponent v-if="showDetails" :event="event" @close="showDetails = false" />
+    </Transition>
   </div>
 </template>
 
 <style scoped lang="scss">
+.v-enter-active,
+.v-leave-active {
+  transition: opacity 0.2s;
+}
+
+.v-enter-from,
+.v-leave-to {
+  opacity: 0;
+}
+
 .event {
   position: relative;
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 1rem;
+  padding: 0.5rem;
   background-color: var(--theme-panel);
   border: 1px solid var(--theme-border-color);
   border-radius: 5px;
   width: 100%;
-  gap: 0.5rem;
-
-  .actions {
-    display: flex;
-    justify-content: center;
-    align-items: flex-end;
-    position: absolute;
-    right: 10px;
-    bottom: 10px;
-
-    button,
-    a {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      text-decoration: none;
-      background-color: transparent;
-      color: var(--theme-text);
-      border: none;
-      border-radius: 50%;
-      padding: 0.5rem;
-      cursor: pointer;
-
-      &:hover {
-        background-color: var(--theme-panel-secondary);
-      }
-
-      &:visited {
-        color: var(--theme-text);
-      }
-    }
-  }
+  gap: 0.1rem;
+  font-size: 0.8rem;
 
   &.past {
     background-color: var(--theme-panel-secondary);
@@ -126,7 +100,7 @@ const timeStatus = computed(() => {
     color: var(--theme-text);
     border: none;
     border-radius: 5px;
-    padding: 0.5rem;
+    font-size: 0.8rem;
     cursor: pointer;
 
     &:hover {
@@ -140,13 +114,28 @@ const timeStatus = computed(() => {
     justify-content: space-between;
     flex-wrap: wrap;
     width: 100%;
-    gap: 0.5rem;
+    gap: 0.2rem;
+    font-size: 0.8rem;
+
+    .material-symbols-outlined {
+      font-size: 1.2rem;
+    }
+
+    .details-button {
+      font-size: 1.2rem;
+      border-radius: 50%;
+      background-color: transparent;
+
+      &.material-symbols-outlined {
+        font-size: 1.4rem;
+      }
+    }
 
     div {
       display: flex;
       flex-wrap: wrap;
       align-items: center;
-      gap: 0.5rem;
+      gap: 0.2rem;
       margin: 0;
     }
 
@@ -160,37 +149,22 @@ const timeStatus = computed(() => {
     text-align: center;
     text-wrap: wrap;
     margin: 0;
-    font-size: 1.2rem;
+    font-size: 1rem;
   }
 
   h2 {
     margin: 0;
-    font-size: 1rem;
+    font-size: 0.9rem;
 
     .speaker {
       font-weight: bold;
       color: var(--main-color);
     }
   }
-}
 
-.description-expand {
-  width: 100%;
-  display: grid;
-  grid-template-rows: 0fr;
-  transition: all 0.5s ease-in-out;
-
-  &.show {
-    grid-template-rows: 1fr;
-  }
-
-  .description {
+  h3 {
+    margin: 0;
     font-size: 0.9rem;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 0.5rem;
-    overflow: hidden;
   }
 }
 </style>
