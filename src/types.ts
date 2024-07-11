@@ -11,6 +11,7 @@ export interface Event {
   start_time: string
   end_time: string
   description: string
+  location?: string
 }
 
 export interface PaginationResponse {

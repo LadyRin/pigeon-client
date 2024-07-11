@@ -27,6 +27,8 @@ const timeStatus = computed(() => {
       <div>
         <span class="material-symbols-outlined"> calendar_month </span>
         {{ formatDate(event.date) }}
+        <span class="material-symbols-outlined" v-if="event.location"> location_on </span>
+        {{ event.location }}
         <div>
           <span class="material-symbols-outlined"> schedule </span>
           {{ formatTime(event.start_time) }} - {{ formatTime(event.end_time) }}
